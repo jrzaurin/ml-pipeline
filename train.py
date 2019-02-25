@@ -131,6 +131,6 @@ class LGBOptimize(object):
 if __name__ == '__main__':
 
 	MD_PATH = Path('data/models/')
-	dtrain = pickle.load(open(MD_PATH/'train.p', 'rb'))
+	dtrain = pickle.load(open(MD_PATH/'train_preprocessor.p', 'rb'))
 	LGBOpt = LGBOptimize(dtrain, MD_PATH)
 	LGBOpt.optimize(maxevals=200)

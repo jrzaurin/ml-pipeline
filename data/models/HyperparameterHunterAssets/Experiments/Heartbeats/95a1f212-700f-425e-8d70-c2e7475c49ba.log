@@ -1,0 +1,51 @@
+<2019-02-25 17:35:17,243> DEBUG    - Logging Logging has been initialized!
+<2019-02-25 17:35:17,244> INFO     - Validated Environment:  '6Ssf2Ev7kGj0-TWajUb2jJGbANQVwN709GGrSDWq2Sg='
+<2019-02-25 17:35:17,247> DEBUG    - Starting preparation_workflow...
+<2019-02-25 17:35:17,247> INFO     - Initialized Experiment: '95a1f212-700f-425e-8d70-c2e7475c49ba'
+<2019-02-25 17:35:17,247> DEBUG    - Skipped source backup:  '/usr/local/lib/python3.6/site-packages/hyperparameter_hunter/optimization_core.py'
+<2019-02-25 17:35:17,247> DEBUG    - Experiment parameters have been validated
+<2019-02-25 17:35:17,255> INFO     - Hyperparameter Key:     'Q34QRjYFx11_ludEW5r_9NKCRndg7yHer-R6qqpejqo='
+<2019-02-25 17:35:17,255> DEBUG    - Raw hyperparameters...
+<2019-02-25 17:35:17,255> DEBUG    - {'model_initializer': 'teDg862HwbPFQT8mtGsUT0xHdqb1xYKIXnDiEmrUDo8=', 'model_init_params': {'boosting_type': 'gbdt', 'num_leaves': 163, 'max_depth': -1, 'learning_rate': 0.02448050023050853, 'n_estimators': 100, 'subsample_for_bin': 200000, 'objective': None, 'class_weight': None, 'min_split_gain': 0.0, 'min_child_weight': 5.661739215354489, 'min_child_samples': 20, 'subsample': 0.8831792361871058, 'subsample_freq': 0, 'colsample_bytree': 0.9554541648338801, 'reg_alpha': 0.018361895215418964, 'reg_lambda': 0.09122692511009946, 'random_state': None, 'n_jobs': -1, 'silent': True, 'importance_type': 'split', 'num_boost_round': 250}, 'model_extra_params': {'feature_name': ['age', 'workclass', 'fnlwgt', 'education', 'marital_status', 'occupation', 'relationship', 'race', 'gender', 'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'education_occupation', 'native_country_occupation'], 'categorical_feature': ['workclass', 'education', 'marital_status', 'occupation', 'relationship', 'race', 'gender', 'native_country', 'education_occupation', 'native_country_occupation']}, 'preprocessing_pipeline': {}, 'preprocessing_params': {}, 'feature_selector': ['age', 'workclass', 'fnlwgt', 'education', 'marital_status', 'occupation', 'relationship', 'race', 'gender', 'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'education_occupation', 'native_country_occupation']}
+<2019-02-25 17:35:17,255> DEBUG    - Completed preparation_workflow
+<2019-02-25 17:35:17,255> DEBUG    - BaseExperiment._random_seed_initializer() done
+<2019-02-25 17:35:17,255> DEBUG    - Initialized random seeds for experiment
+<2019-02-25 17:35:17,259> DEBUG    - Initial preprocessing stage complete
+<2019-02-25 17:35:17,260> INFO     - 
+<2019-02-25 17:35:17,260> DEBUG    - BaseCallback.on_experiment_start()
+<2019-02-25 17:35:17,260> DEBUG    - BaseCallback.on_repetition_start()
+<2019-02-25 17:35:17,266> DEBUG    - BaseCallback.on_fold_start()
+<2019-02-25 17:35:17,270> DEBUG    - F0/R0  |  Seed: 10967   Time: 17:35:17
+<2019-02-25 17:35:17,271> DEBUG    - BaseCallback.on_run_start()
+<2019-02-25 17:35:18,890> DEBUG    - F0/R0  |  OOF(f1_score=0.69370)  |  Time Elapsed: 1.61924 s
+<2019-02-25 17:35:18,890> DEBUG    - BaseCallback.on_run_end()
+<2019-02-25 17:35:18,897> INFO     - F0.0 AVG:   OOF(f1_score=0.69370)  |  Time Elapsed: 1.63112 s
+<2019-02-25 17:35:18,897> DEBUG    - BaseCallback.on_fold_end()
+<2019-02-25 17:35:18,897> DEBUG    - BaseCallback.on_fold_start()
+<2019-02-25 17:35:18,903> DEBUG    - F1/R0  |  Seed: 75062   Time: 17:35:18
+<2019-02-25 17:35:18,903> DEBUG    - BaseCallback.on_run_start()
+<2019-02-25 17:35:20,343> DEBUG    - F1/R0  |  OOF(f1_score=0.69565)  |  Time Elapsed: 1.44031 s
+<2019-02-25 17:35:20,343> DEBUG    - BaseCallback.on_run_end()
+<2019-02-25 17:35:20,350> INFO     - F0.1 AVG:   OOF(f1_score=0.69565)  |  Time Elapsed: 1.45262 s
+<2019-02-25 17:35:20,350> DEBUG    - BaseCallback.on_fold_end()
+<2019-02-25 17:35:20,350> DEBUG    - BaseCallback.on_fold_start()
+<2019-02-25 17:35:20,355> DEBUG    - F2/R0  |  Seed: 60284   Time: 17:35:20
+<2019-02-25 17:35:20,356> DEBUG    - BaseCallback.on_run_start()
+<2019-02-25 17:35:21,960> DEBUG    - F2/R0  |  OOF(f1_score=0.69807)  |  Time Elapsed: 1.60415 s
+<2019-02-25 17:35:21,960> DEBUG    - BaseCallback.on_run_end()
+<2019-02-25 17:35:21,967> INFO     - F0.2 AVG:   OOF(f1_score=0.69807)  |  Time Elapsed: 1.6162 s
+<2019-02-25 17:35:21,967> DEBUG    - BaseCallback.on_fold_end()
+<2019-02-25 17:35:21,979> DEBUG    - Repetition 0 AVG:   OOF(f1_score=0.69581)  |  Time Elapsed: 4.71843 s
+<2019-02-25 17:35:21,979> DEBUG    - BaseCallback.on_repetition_end()
+<2019-02-25 17:35:21,991> INFO     - 
+<2019-02-25 17:35:21,991> INFO     - FINAL:    OOF(f1_score=0.69581)  |  Time Elapsed: 4.73114 s
+<2019-02-25 17:35:21,991> DEBUG    - BaseCallback.on_experiment_end()
+<2019-02-25 17:35:21,991> INFO     - 
+<2019-02-25 17:35:22,006> INFO     - Saving results for Experiment: '95a1f212-700f-425e-8d70-c2e7475c49ba'
+<2019-02-25 17:35:22,006> DEBUG    - Saving result file for 'TestedKeyRecorder'
+<2019-02-25 17:35:22,006> DEBUG    - cross_experiment_key "6Ssf2Ev7kGj0-TWajUb2jJGbANQVwN709GGrSDWq2Sg=" already exists - Skipped saving
+<2019-02-25 17:35:22,008> DEBUG    - Saved hyperparameter_key: "Q34QRjYFx11_ludEW5r_9NKCRndg7yHer-R6qqpejqo="
+<2019-02-25 17:35:22,011> DEBUG    - Saving result file for 'LeaderboardEntryRecorder'
+<2019-02-25 17:35:22,013> DEBUG    - Saving result file for 'DescriptionRecorder'
+<2019-02-25 17:35:22,017> DEBUG    - Saving result file for 'PredictionsOOFRecorder'
+<2019-02-25 17:35:22,146> DEBUG    - Saving result file for 'HeartbeatRecorder'

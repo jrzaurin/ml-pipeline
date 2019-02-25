@@ -1,0 +1,59 @@
+<2019-02-25 17:35:26,134> DEBUG    - Logging Logging has been initialized!
+<2019-02-25 17:35:26,134> INFO     - Validated Environment:  '6Ssf2Ev7kGj0-TWajUb2jJGbANQVwN709GGrSDWq2Sg='
+<2019-02-25 17:35:26,138> DEBUG    - Starting preparation_workflow...
+<2019-02-25 17:35:26,138> INFO     - Initialized Experiment: 'e4bdce04-2a43-4218-8309-a201c9168716'
+<2019-02-25 17:35:26,138> DEBUG    - Skipped source backup:  '/usr/local/lib/python3.6/site-packages/hyperparameter_hunter/optimization_core.py'
+<2019-02-25 17:35:26,138> DEBUG    - Experiment parameters have been validated
+<2019-02-25 17:35:26,147> INFO     - Hyperparameter Key:     'nVqEgLOdQ7Qpi1PIIThnoRqLWR_ZbBUDbn1o_RGz7mc='
+<2019-02-25 17:35:26,147> DEBUG    - Raw hyperparameters...
+<2019-02-25 17:35:26,147> DEBUG    - {'model_initializer': 'teDg862HwbPFQT8mtGsUT0xHdqb1xYKIXnDiEmrUDo8=', 'model_init_params': {'boosting_type': 'gbdt', 'num_leaves': 67, 'max_depth': -1, 'learning_rate': 0.09943901019064309, 'n_estimators': 100, 'subsample_for_bin': 200000, 'objective': None, 'class_weight': None, 'min_split_gain': 0.0, 'min_child_weight': 0.5461178876251646, 'min_child_samples': 20, 'subsample': 0.619288063161956, 'subsample_freq': 0, 'colsample_bytree': 0.8374172648652111, 'reg_alpha': 0.08041444745658727, 'reg_lambda': 0.07256814710899676, 'random_state': None, 'n_jobs': -1, 'silent': True, 'importance_type': 'split', 'num_boost_round': 190}, 'model_extra_params': {'feature_name': ['age', 'workclass', 'fnlwgt', 'education', 'marital_status', 'occupation', 'relationship', 'race', 'gender', 'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'education_occupation', 'native_country_occupation'], 'categorical_feature': ['workclass', 'education', 'marital_status', 'occupation', 'relationship', 'race', 'gender', 'native_country', 'education_occupation', 'native_country_occupation']}, 'preprocessing_pipeline': {}, 'preprocessing_params': {}, 'feature_selector': ['age', 'workclass', 'fnlwgt', 'education', 'marital_status', 'occupation', 'relationship', 'race', 'gender', 'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'education_occupation', 'native_country_occupation']}
+<2019-02-25 17:35:26,147> DEBUG    - Completed preparation_workflow
+<2019-02-25 17:35:26,147> DEBUG    - BaseExperiment._random_seed_initializer() done
+<2019-02-25 17:35:26,147> DEBUG    - Initialized random seeds for experiment
+<2019-02-25 17:35:26,151> DEBUG    - Initial preprocessing stage complete
+<2019-02-25 17:35:26,152> INFO     - 
+<2019-02-25 17:35:26,152> DEBUG    - BaseCallback.on_experiment_start()
+<2019-02-25 17:35:26,152> DEBUG    - BaseCallback.on_repetition_start()
+<2019-02-25 17:35:26,158> DEBUG    - BaseCallback.on_fold_start()
+<2019-02-25 17:35:26,163> DEBUG    - F0/R0  |  Seed: 10967   Time: 17:35:26
+<2019-02-25 17:35:26,163> DEBUG    - BaseCallback.on_run_start()
+<2019-02-25 17:35:26,783> DEBUG    - F0/R0  |  OOF(f1_score=0.69608)  |  Time Elapsed: 0.61926 s
+<2019-02-25 17:35:26,783> DEBUG    - BaseCallback.on_run_end()
+<2019-02-25 17:35:26,790> INFO     - F0.0 AVG:   OOF(f1_score=0.69608)  |  Time Elapsed: 0.63183 s
+<2019-02-25 17:35:26,790> DEBUG    - BaseCallback.on_fold_end()
+<2019-02-25 17:35:26,790> DEBUG    - BaseCallback.on_fold_start()
+<2019-02-25 17:35:26,797> DEBUG    - F1/R0  |  Seed: 75062   Time: 17:35:26
+<2019-02-25 17:35:26,798> DEBUG    - BaseCallback.on_run_start()
+<2019-02-25 17:35:27,474> DEBUG    - F1/R0  |  OOF(f1_score=0.70763)  |  Time Elapsed: 0.67665 s
+<2019-02-25 17:35:27,474> DEBUG    - BaseCallback.on_run_end()
+<2019-02-25 17:35:27,481> INFO     - F0.1 AVG:   OOF(f1_score=0.70763)  |  Time Elapsed: 0.691 s
+<2019-02-25 17:35:27,481> DEBUG    - BaseCallback.on_fold_end()
+<2019-02-25 17:35:27,482> DEBUG    - BaseCallback.on_fold_start()
+<2019-02-25 17:35:27,488> DEBUG    - F2/R0  |  Seed: 60284   Time: 17:35:27
+<2019-02-25 17:35:27,488> DEBUG    - BaseCallback.on_run_start()
+<2019-02-25 17:35:28,136> DEBUG    - F2/R0  |  OOF(f1_score=0.70330)  |  Time Elapsed: 0.64772 s
+<2019-02-25 17:35:28,136> DEBUG    - BaseCallback.on_run_end()
+<2019-02-25 17:35:28,143> INFO     - F0.2 AVG:   OOF(f1_score=0.70330)  |  Time Elapsed: 0.66109 s
+<2019-02-25 17:35:28,143> DEBUG    - BaseCallback.on_fold_end()
+<2019-02-25 17:35:28,155> DEBUG    - Repetition 0 AVG:   OOF(f1_score=0.70234)  |  Time Elapsed: 2.00229 s
+<2019-02-25 17:35:28,155> DEBUG    - BaseCallback.on_repetition_end()
+<2019-02-25 17:35:28,167> INFO     - 
+<2019-02-25 17:35:28,167> INFO     - FINAL:    OOF(f1_score=0.70234)  |  Time Elapsed: 2.0152 s
+<2019-02-25 17:35:28,167> DEBUG    - BaseCallback.on_experiment_end()
+<2019-02-25 17:35:28,167> INFO     - 
+<2019-02-25 17:35:28,182> INFO     - Saving results for Experiment: 'e4bdce04-2a43-4218-8309-a201c9168716'
+<2019-02-25 17:35:28,183> DEBUG    - Saving result file for 'TestedKeyRecorder'
+<2019-02-25 17:35:28,183> DEBUG    - cross_experiment_key "6Ssf2Ev7kGj0-TWajUb2jJGbANQVwN709GGrSDWq2Sg=" already exists - Skipped saving
+<2019-02-25 17:35:28,185> DEBUG    - Saved hyperparameter_key: "nVqEgLOdQ7Qpi1PIIThnoRqLWR_ZbBUDbn1o_RGz7mc="
+<2019-02-25 17:35:28,187> DEBUG    - Saving result file for 'LeaderboardEntryRecorder'
+<2019-02-25 17:35:28,189> DEBUG    - Saving result file for 'DescriptionRecorder'
+<2019-02-25 17:35:28,190> DEBUG    - Saving result file for 'PredictionsOOFRecorder'
+<2019-02-25 17:35:28,318> DEBUG    - Saving result file for 'HeartbeatRecorder'
+<2019-02-25 17:35:40,631> DEBUG    - pickle loaded: /usr/local/lib/python3.6/site-packages/hyperparameter_hunter/optimization.py
+<2019-02-25 17:35:43,490> DEBUG    - diff parser start
+<2019-02-25 17:35:43,491> DEBUG    - diff parser calculated
+<2019-02-25 17:35:43,491> DEBUG    - diff: line_lengths old: 1, new: 1
+<2019-02-25 17:35:43,491> DEBUG    - diff replace old[1:1] new[1:1]
+<2019-02-25 17:35:43,491> DEBUG    - parse_part from 1 to 1 (to 0 in part parser)
+<2019-02-25 17:35:43,492> DEBUG    - diff parser end
+<2019-02-25 17:35:43,531> DEBUG    - pickle loaded: /usr/local/lib/python3.6/site-packages/numpy/__init__.py
