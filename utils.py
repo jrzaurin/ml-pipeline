@@ -1,5 +1,45 @@
 import pandas as pd
 import copy
+import json
+from kafka import KafkaProducer
+
+
+def load_training_data(path):
+	data = []
+	with open (path/"messages.txt", "r") as f:
+		for line in f:
+			data.append(json.loads(line))
+
+	return pd.DataFrame(data)
+
+
+def publish_traininig_completed():
+	producer = KafkaProducer(bootstrap_servers='localhost:9092')
+	producer.send('retrain_topic', json.dumps({'training_completed': True}).encode('utf-8'))
+	producer.flush()
+
+
+def read_messages_count(path):
+	try:
+		return len(open(path/"messages.txt").readlines(  ))
+	except:
+		return 0
+
+
+
+def append_message(message, path):
+	f=open(path/"messages.txt", "a")
+	f.write("%s\n" % (json.dumps(message)))
+	f.close()
+
+
+
+def send_retrain_message():
+	producer = KafkaProducer(bootstrap_servers='localhost:9092')
+	producer.send('retrain_topic', json.dumps({'retrain': True}).encode('utf-8'))
+	producer.flush()
+
+
 
 
 class FeatureTools(object):
