@@ -2,7 +2,10 @@ import numpy as np
 import pandas as pd
 import warnings
 import pickle
+import json
 import lightgbm as lgb
+
+import pdb
 
 from pathlib import Path
 from hyperparameter_hunter import (Environment, CVExperiment,
@@ -13,14 +16,13 @@ from sklearn.model_selection import StratifiedKFold
 warnings.filterwarnings("ignore")
 
 
-class HHOpt(object):
-    """docstring for HHOpt"""
+class HHOptimizer(object):
+    """docstring for HHOptimizer"""
     def __init__(self, trainDataset, out_dir):
 
-        self.PATH = str(out_dir)
+        self.PATH = out_dir
         self.data = trainDataset.data
-        self.target = trainDataset.target
-        self.data['target'] = self.target
+        self.data['target'] = trainDataset.target
         self.colnames = trainDataset.colnames
         self.categorical_columns = trainDataset.cat_cols + trainDataset.crossed_columns
 
@@ -47,11 +49,26 @@ class HHOpt(object):
         )
         optimizer.go()
 
-        return optimizer
+        best_experiment = self.PATH+\
+            '/HyperparameterHunterAssets/Experiments/Descriptions/'+\
+            optimizer.best_experiment+'.json'
+        with open(best_experiment) as best:
+            best = json.loads(best.read())['hyperparameters']['model_init_params']
+        model = lgb.LGBMClassifier(**best)
+        X, y = self.data.drop('target',axis=1), self.data.target
+        model.fit(X,y,
+            feature_name=self.colnames,
+            categorical_feature=self.categorical_columns
+            )
+        pickle.dump(model, open(self.PATH+'/HHmodel.p', 'wb'))
+        pickle.dump(optimizer, open(self.PATH+'/HHoptimizer.p', 'wb'))
+
+        return
 
     def hyperparameter_space(self, param_space=None):
 
         space = dict(
+                is_unbalance = True,
                 learning_rate = Real(0.01, 0.3),
                 num_boost_round=Categorical(np.arange(50, 500, 20)),
                 num_leaves=Categorical(np.arange(31, 256, 4)),
@@ -71,6 +88,7 @@ class HHOpt(object):
     def extra_setup(self, extra_setup=None):
 
         extra_params = dict(
+            early_stopping_rounds=20,
             feature_name=self.colnames,
             categorical_feature=self.categorical_columns
         )
@@ -80,9 +98,9 @@ class HHOpt(object):
         else:
             return extra_params
 
-
+# if __name__ == '__main__':
 
 MD_PATH = Path('data/models/')
 dtrain = pickle.load(open(MD_PATH/'train_preprocessor.p', 'rb'))
-LGBOpt = HHOpt(dtrain, str(MD_PATH))
-optimizer = LGBOpt.optimize('f1_score', StratifiedKFold, n_splits=3, maxevals=5)
+HHOpt = HHOptimizer(dtrain, str(MD_PATH))
+optimizer = HHOpt.optimize('f1_score', StratifiedKFold, n_splits=3, maxevals=3)
