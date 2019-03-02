@@ -26,12 +26,7 @@ def append_message(message, path, batch_id):
 	f.close()
 
 
-def send_retrain_message(model_id):
+def send_retrain_message(model_id, batch_id):
 	producer = KafkaProducer(bootstrap_servers='localhost:9092')
-	producer.send('retrain_topic', json.dumps({'retrain': True, 'model_id': model_id}).encode('utf-8'))
+	producer.send('retrain_topic', json.dumps({'retrain': True, 'model_id': model_id, 'batch_id': batch_id}).encode('utf-8'))
 	producer.flush()
-
-
-def reload_model(path):
-	return pickle.load(open(path, 'rb'))
-

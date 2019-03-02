@@ -2,16 +2,10 @@ import pdb
 import json
 import pandas as pd
 import pickle
-import logging
-
-from utils.feature_tools import FeatureTools
 
 from pathlib import Path
 from kafka import KafkaConsumer
-from utils.messages_utils import append_message, read_messages_count, send_retrain_message, reload_model
-
-logger = logging.getLogger('ml_pipelines')
-logger.setLevel(logging.INFO)
+from utils.messages_utils import append_message, read_messages_count, send_retrain_message
 
 KAFKA_HOST = 'localhost:9092'
 TOPICS = ['app_messages', 'retrain_topic']
@@ -19,7 +13,7 @@ PATH = Path('data/')
 MODELS_PATH = PATH/'models'
 DATAPROCESSORS_PATH = PATH/'dataprocessors'
 MESSAGES_PATH = PATH/'messages'
-RETRAIN_EVERY = 50
+RETRAIN_EVERY = 10
 EXTRA_MODELS_TO_KEEP = 1
 
 dataprocessor = None
@@ -27,13 +21,17 @@ consumer = None
 model = None
 
 
-def is_retraining_message(message):
+def reload_model(path):
+	return pickle.load(open(path, 'rb'))
+
+
+def is_retraining_message(msg):
 	message = json.loads(msg.value)
 	return msg.topic == 'retrain_topic' and 'training_completed' in message and message['training_completed']
 
 
 def is_application_message(message):
-	return msg.topic == 'app_messages'
+	return message.topic == 'app_messages'
 
 
 def predict(message):
@@ -50,8 +48,7 @@ def start(model_id, messages_count, batch_id):
 		if is_retraining_message(msg):
 			model_fname = 'model_{}_.p'.format(model_id)
 			model = reload_model(MODELS_PATH/model_fname)
-			logger.info("NEW MODEL RELOADED")
-			model_id = (model_id + 1) % (EXTRA_MODELS_TO_KEEP + 1)
+			print("NEW MODEL RELOADED {}".format(model_id))
 			
 
 		elif is_application_message(msg):
@@ -59,9 +56,10 @@ def start(model_id, messages_count, batch_id):
 			append_message(message, MESSAGES_PATH, batch_id)
 			messages_count += 1
 			if messages_count % RETRAIN_EVERY == 0:
-				send_retrain_message(model_id)
+				model_id = (model_id + 1) % (EXTRA_MODELS_TO_KEEP + 1)
+				send_retrain_message(model_id, batch_id)
 				batch_id += 1
-			logger.info('observation number: {}. Prediction: {}'.format(messages_count,pred))
+			print('observation number: {}. Prediction: {}'.format(messages_count,pred))
 
 
 

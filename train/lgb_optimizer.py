@@ -5,6 +5,8 @@ import pickle
 import pdb
 import warnings
 
+from hyperopt import hp, tpe, fmin, Trials
+
 warnings.filterwarnings("ignore")
 
 

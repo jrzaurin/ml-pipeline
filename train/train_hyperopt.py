@@ -6,9 +6,8 @@ import pdb
 import warnings
 
 from pathlib import Path
-from hyperopt import hp, tpe, fmin, Trials
 from sklearn.metrics import f1_score
-from lgb_optimizer import LGBOptimizer
+from train.lgb_optimizer import LGBOptimizer
 
 warnings.filterwarnings("ignore")
 
@@ -30,14 +29,3 @@ def lgb_f1_score(preds, lgbDataset):
 	y_true = lgbDataset.get_label()
 	# lightgbm: (eval_name, eval_result, is_higher_better)
 	return 'f1', f1_score(y_true, binary_preds), True
-
-
-if __name__ == '__main__':
-
-	PATH = Path('data/')
-	MODELS_PATH = PATH/'models'
-	DATAPROCESSORS_PATH = PATH/'dataprocessors'
-	init_dataprocessor = 'dataprocessor_0_.p'
-	dtrain = pickle.load(open(DATAPROCESSORS_PATH/init_dataprocessor, 'rb'))
-	LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
-	LGBOpt.optimize(maxevals=10)

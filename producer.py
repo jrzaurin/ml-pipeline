@@ -13,6 +13,7 @@ messages = df_test.json.tolist()
 
 producer = KafkaProducer(bootstrap_servers='localhost:9092')
 for i in range(200):
+	print(i)
 	producer.send('app_messages', messages[i].encode('utf-8'))
 	producer.flush()
 	sleep(2)

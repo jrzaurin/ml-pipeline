@@ -19,14 +19,14 @@ def load_new_training_data(path):
 	return pd.DataFrame(data)
 
 
-def build_train(PATH_1, results_path, dataprocessor_id=0, PATH_2=None):
+def build_train(train_path, results_path, dataprocessor_id=0, PATH_2=None):
 	target = 'income_label'
-	df = pd.read_csv(PATH_1)
+	df = pd.read_csv(train_path)
 	if PATH_2:
 		df_tmp = load_new_training_data(PATH_2)
 		df_tmp = df_tmp[df.columns]
 		df = pd.concat([df, df_tmp], ignore_index=True)
-		df.to_csv(PATH_1, index=False)
+		df.to_csv(train_path, index=False)
 	df[target] = (df['income_bracket'].apply(lambda x: '>50K' in x)).astype(int)
 	df.drop('income_bracket', axis=1, inplace=True)
 	categorical_columns = list(df.select_dtypes(include=['object']).columns)
@@ -44,11 +44,11 @@ def build_train(PATH_1, results_path, dataprocessor_id=0, PATH_2=None):
 	return dataprocessor
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-	PATH = Path('data/')
-	TRAIN_PATH = PATH/'train'
-	DATAPROCESSORS_PATH = PATH/'dataprocessors'
+# 	PATH = Path('data/')
+# 	TRAIN_PATH = PATH/'train'
+# 	DATAPROCESSORS_PATH = PATH/'dataprocessors'
 
-	dataprocessor = build_train(TRAIN_PATH/'train.csv', DATAPROCESSORS_PATH)
+# 	dataprocessor = build_train(TRAIN_PATH/'train.csv', DATAPROCESSORS_PATH)
 
