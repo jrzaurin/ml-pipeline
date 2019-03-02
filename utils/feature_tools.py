@@ -1,42 +1,5 @@
 import pandas as pd
 import copy
-import json
-import pickle
-
-from kafka import KafkaProducer
-
-
-def publish_traininig_completed():
-	producer = KafkaProducer(bootstrap_servers='localhost:9092')
-	producer.send('retrain_topic', json.dumps({'training_completed': True}).encode('utf-8'))
-	producer.flush()
-
-
-def read_messages_count(path, repeat_every):
-	file_list=list(path.iterdir())
-	nfiles = len(file_list)
-	if nfiles==0:
-		return 0
-	else:
-		return ((nfiles-1)*repeat_every) + len(file_list[-1].open().readlines())
-
-
-def append_message(message, path, message_id):
-	message_fname = 'messages_{}_.txt'.format(message_id)
-	f=open(path/message_fname, "a")
-	f.write("%s\n" % (json.dumps(message)))
-	f.close()
-
-
-def send_retrain_message():
-	producer = KafkaProducer(bootstrap_servers='localhost:9092')
-	producer.send('retrain_topic', json.dumps({'retrain': True}).encode('utf-8'))
-	producer.flush()
-
-
-def reload_model(path):
-	return pickle.load(open(path, 'rb'))
-
 
 class FeatureTools(object):
 
@@ -107,4 +70,3 @@ class FeatureTools(object):
 		df, _ = self.val2idx(df, self.cat_cols+self.crossed_columns, self.encoding_d)
 
 		return df
-
