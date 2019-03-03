@@ -5,7 +5,7 @@ import pickle
 
 from pathlib import Path
 from kafka import KafkaConsumer
-from utils.messages_utils import append_message, read_messages_count, send_retrain_message
+from utils.messages_utils import append_message, read_messages_count, send_retrain_message, publish_prediction
 
 KAFKA_HOST = 'localhost:9092'
 TOPICS = ['app_messages', 'retrain_topic']
@@ -13,7 +13,7 @@ PATH = Path('data/')
 MODELS_PATH = PATH/'models'
 DATAPROCESSORS_PATH = PATH/'dataprocessors'
 MESSAGES_PATH = PATH/'messages'
-RETRAIN_EVERY = 50
+RETRAIN_EVERY = 10
 EXTRA_MODELS_TO_KEEP = 1
 
 column_order = pickle.load(open(DATAPROCESSORS_PATH/'column_order.p', 'rb'))
@@ -31,8 +31,9 @@ def is_retraining_message(msg):
 	return msg.topic == 'retrain_topic' and 'training_completed' in message and message['training_completed']
 
 
-def is_application_message(message):
-	return message.topic == 'app_messages'
+def is_application_message(msg):
+	message = json.loads(msg.value)
+	return msg.topic == 'app_messages' and 'prediction' not in message
 
 
 def predict(message, column_order):
@@ -59,14 +60,16 @@ def start(model_id, messages_count, batch_id):
 			print("NEW MODEL RELOADED {}".format(model_id))
 
 		elif is_application_message(msg):
-			pred = predict(message, column_order)
-			append_message(message, MESSAGES_PATH, batch_id)
+			request_id = message['request_id']
+			pred = predict(message['data'], column_order)
+			publish_prediction(pred, request_id)
+
+			append_message(message['data'], MESSAGES_PATH, batch_id)
 			messages_count += 1
 			if messages_count % RETRAIN_EVERY == 0:
 				model_id = (model_id + 1) % (EXTRA_MODELS_TO_KEEP + 1)
 				send_retrain_message(model_id, batch_id)
 				batch_id += 1
-			print('observation number: {}. Prediction: {}'.format(messages_count,pred))
 
 
 if __name__ == '__main__':
