@@ -18,12 +18,11 @@ TRAIN_DATA = PATH/'train/train.csv'
 DATAPROCESSORS_PATH = PATH/'dataprocessors'
 MODELS_PATH = PATH/'models'
 MESSAGES_PATH = PATH/'messages'
-DATAPROCESSOR_ID = 0
 
 
 def train(model_id, messages):
 	print("RETRAINING STARTED (model id: {})".format(model_id))
-	dtrain = build_train(TRAIN_DATA, DATAPROCESSORS_PATH, DATAPROCESSOR_ID, messages)
+	dtrain = build_train(TRAIN_DATA, DATAPROCESSORS_PATH, model_id, messages)
 	LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
 	LGBOpt.optimize(maxevals=10, model_id=model_id)
 	print("RETRAINING COMPLETED (model id: {})".format(model_id))
@@ -40,7 +39,7 @@ def start():
 			batch_id = message['batch_id']
 			message_fname = 'messages_{}_.txt'.format(batch_id)
 			messages = MESSAGES_PATH/message_fname
-			
+
 			train(model_id, messages)
 			publish_traininig_completed(model_id)
 

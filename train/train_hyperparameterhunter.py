@@ -16,16 +16,31 @@ from sklearn.model_selection import StratifiedKFold
 warnings.filterwarnings("ignore")
 
 
-class HHOptimizer(object):
-    """docstring for HHOptimizer"""
+class LGBOptimizer(object):
     def __init__(self, trainDataset, out_dir):
+        """
+        Hyper Parameter optimization
+
+        Comments: Hyperparameter_hunter (hereafter HH) is a fantastic package
+        (https://github.com/HunterMcGushion/hyperparameter_hunter) to avoid
+        wasting time as you optimise parameters. In the words of his author:
+        "For so long, hyperparameter optimization has been such a time
+        consuming process that just pointed you in a direction for further
+        optimization, then you basically had to start over".
+
+        Parameters:
+        -----------
+        trainDataset: FeatureTools object
+            The result of running FeatureTools().fit()
+        out_dir: Str
+            Path to the output directory
+        """
 
         self.PATH = out_dir
         self.data = trainDataset.data
         self.data['target'] = trainDataset.target
         self.colnames = trainDataset.colnames
-        self.categorical_columns = trainDataset.cat_cols + trainDataset.crossed_columns
-
+        self.categorical_columns = trainDataset.categorical_columns + trainDataset.crossed_columns
 
     def optimize(self, metrics, cv_type, n_splits, maxevals=200, do_predict_proba=None):
 
@@ -48,7 +63,9 @@ class HHOptimizer(object):
             model_extra_params=extra_params
         )
         optimizer.go()
-
+        # there are a few fixes on its way and the next few lines will soon be
+        # one. At the moment, to access to the best parameters one has to read
+        # from disc and access them
         best_experiment = self.PATH+\
             '/HyperparameterHunterAssets/Experiments/Descriptions/'+\
             optimizer.best_experiment+'.json'
@@ -100,7 +117,7 @@ class HHOptimizer(object):
 
 # if __name__ == '__main__':
 
-MD_PATH = Path('data/models/')
-dtrain = pickle.load(open(MD_PATH/'preprocessor_0_.p', 'rb'))
-HHOpt = HHOptimizer(dtrain, str(MD_PATH))
-optimizer = HHOpt.optimize('f1_score', StratifiedKFold, n_splits=3, maxevals=3)
+#     MD_PATH = Path('data/models/')
+#     dtrain = pickle.load(open(MD_PATH/'preprocessor_0_.p', 'rb'))
+#     HHOpt = HHOptimizer(dtrain, str(MD_PATH))
+#     optimizer = HHOpt.optimize('f1_score', StratifiedKFold, n_splits=3, maxevals=3)

@@ -13,9 +13,10 @@ PATH = Path('data/')
 MODELS_PATH = PATH/'models'
 DATAPROCESSORS_PATH = PATH/'dataprocessors'
 MESSAGES_PATH = PATH/'messages'
-RETRAIN_EVERY = 10
+RETRAIN_EVERY = 50
 EXTRA_MODELS_TO_KEEP = 1
 
+column_order = pickle.load(open(DATAPROCESSORS_PATH/'column_order.p', 'rb'))
 dataprocessor = None
 consumer = None
 model = None
@@ -34,8 +35,15 @@ def is_application_message(message):
 	return message.topic == 'app_messages'
 
 
-def predict(message):
+def predict(message, column_order):
 	row = pd.DataFrame(message, index=[0])
+	# sanity check
+	assert row.columns.tolist()[:-1] == column_order
+	# In the real world we would not have the target (here 'income_bracket').
+	# In this example we keep it and we will retrain the model as it reads
+	# RETRAIN_EVERY number of messages. In the real world, after RETRAIN_EVERY
+	# number of messages have been collected, one would have to wait until we
+	# can collect RETRAIN_EVERY targets AND THEN retrain (trainer_consumer)
 	row.drop('income_bracket', axis=1, inplace=True)
 	trow = dataprocessor.transform(row)
 	return model.predict(trow)[0]
@@ -49,10 +57,9 @@ def start(model_id, messages_count, batch_id):
 			model_fname = 'model_{}_.p'.format(model_id)
 			model = reload_model(MODELS_PATH/model_fname)
 			print("NEW MODEL RELOADED {}".format(model_id))
-			
 
 		elif is_application_message(msg):
-			pred = predict(message)
+			pred = predict(message, column_order)
 			append_message(message, MESSAGES_PATH, batch_id)
 			messages_count += 1
 			if messages_count % RETRAIN_EVERY == 0:
@@ -60,7 +67,6 @@ def start(model_id, messages_count, batch_id):
 				send_retrain_message(model_id, batch_id)
 				batch_id += 1
 			print('observation number: {}. Prediction: {}'.format(messages_count,pred))
-
 
 
 if __name__ == '__main__':

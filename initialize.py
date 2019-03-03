@@ -7,8 +7,7 @@ import warnings
 import os
 
 from pathlib import Path
-from sklearn.metrics import f1_score
-from train.lgb_optimizer import LGBOptimizer
+from train.train_hyperopt import LGBOptimizer
 from utils.preprocess_data import build_train
 
 
@@ -21,11 +20,11 @@ MESSAGES_PATH = PATH/'messages'
 
 def create_folders():
 	print("creating directory structure...")
-	os.mkdir(PATH)
-	os.mkdir(TRAIN_PATH)
-	os.mkdir(MODELS_PATH)
-	os.mkdir(DATAPROCESSORS_PATH)
-	os.mkdir(MESSAGES_PATH)
+	(PATH).mkdir(exist_ok=True)
+	(TRAIN_PATH).mkdir(exist_ok=True)
+	(MODELS_PATH).mkdir(exist_ok=True)
+	(DATAPROCESSORS_PATH).mkdir(exist_ok=True)
+	(MESSAGES_PATH).mkdir(exist_ok=True)
 
 
 def download_data():
