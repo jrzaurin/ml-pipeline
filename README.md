@@ -34,7 +34,7 @@ The "offline" process is all accomplished by running the `initialize.py` script.
 
 As we mentioned before, the first script that needs to run is `initialize.py`. As mentioned before, to train the algorithm and optimize the hyperparameters we have used LightGBM along with Hyperopt or HyperparameterHunter. The later is built on top of Skopt. It is not our goal here to compare hyperparameter optimization packages. Nonetheless, a brief comparison is included in the medium post and a notebook comparing Skopt and Hyperopt performances is included here.
 
-After running `initialize.py` one simply needs to run `predictor.py`, `trainer.py` and `sample_app.py` as shown in the GIF below. Note that we have added a delay of 2sec between messages so the output in the screen is readable.
+After running `initialize.py` one simply needs to run `trainer.py`, `predictor.py` and `sample_app.py` as shown in the GIF below. Note that we have added a delay of 2sec between messages so the output in the screen is readable.
 
 <img src="images/start_pipeline.gif" width="800" height="500" />
 
