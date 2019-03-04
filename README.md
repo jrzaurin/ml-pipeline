@@ -1,4 +1,4 @@
-# Putting ML to Production
+# Putting ML in Production
 This repo contains code that we hope is useful to illustrate how one could productionise a real-time algorithm. The companion Medium post can be found here. The code here is meant to be as generic as possible (within certain limits), and is designed to be useful in an scenario similar to the following one.
 
 ## Scenario
@@ -9,7 +9,7 @@ For the exercise here we have used the [Adult](https://archive.ics.uci.edu/ml/da
 
 ## Solution
 
-The "online" part of our solution is illustrated in the figure below, and uses mainly [Kafka-Python](https://github.com/dpkp/kafka-python), [LightGBM](https://lightgbm.readthedocs.io/en/latest/#) and [Hyperopt](http://hyperopt.github.io/hyperopt/) or [HyperparameterHunter](https://github.com/HunterMcGushion/hyperparameter_hunter).
+The online part of our solution is illustrated in the figure below, and uses mainly [Kafka-Python](https://github.com/dpkp/kafka-python), [LightGBM](https://lightgbm.readthedocs.io/en/latest/#) and [Hyperopt](http://hyperopt.github.io/hyperopt/) or [HyperparameterHunter](https://github.com/HunterMcGushion/hyperparameter_hunter).
 
 ![Figure 1. Real-time prediction ML pipeline.](images/pipeline_diagram.png)
 
