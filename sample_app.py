@@ -7,7 +7,6 @@ from pathlib import Path
 from kafka import KafkaProducer, KafkaConsumer
 from time import sleep
 
-# from thread import start_new_thread
 
 PATH = Path('data/')
 KAFKA_HOST = 'localhost:9092'
@@ -35,7 +34,7 @@ def start_producing():
 
 def start_consuming():
 	consumer = KafkaConsumer('app_messages', bootstrap_servers=KAFKA_HOST)
-	
+
 	for msg in consumer:
 		message = json.loads(msg.value)
 		if 'prediction' in message:

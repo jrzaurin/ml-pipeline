@@ -13,7 +13,7 @@ PATH = Path('data/')
 MODELS_PATH = PATH/'models'
 DATAPROCESSORS_PATH = PATH/'dataprocessors'
 MESSAGES_PATH = PATH/'messages'
-RETRAIN_EVERY = 10
+RETRAIN_EVERY = 20
 EXTRA_MODELS_TO_KEEP = 1
 
 column_order = pickle.load(open(DATAPROCESSORS_PATH/'column_order.p', 'rb'))
@@ -44,7 +44,7 @@ def predict(message, column_order):
 	# In this example we keep it and we will retrain the model as it reads
 	# RETRAIN_EVERY number of messages. In the real world, after RETRAIN_EVERY
 	# number of messages have been collected, one would have to wait until we
-	# can collect RETRAIN_EVERY targets AND THEN retrain (trainer_consumer)
+	# can collect RETRAIN_EVERY targets AND THEN retrain
 	row.drop('income_bracket', axis=1, inplace=True)
 	trow = dataprocessor.transform(row)
 	return model.predict(trow)[0]

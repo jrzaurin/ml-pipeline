@@ -9,6 +9,8 @@ from kafka import KafkaConsumer
 from utils.messages_utils import publish_traininig_completed
 from utils.preprocess_data import build_train
 from train.train_hyperopt import LGBOptimizer
+# uncomment line below to use hyperparameterhunter
+# from train.train_hyperparameterhunter import LGBOptimizer
 
 
 KAFKA_HOST = 'localhost:9092'
@@ -26,7 +28,6 @@ def train(model_id, messages):
 	LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
 	LGBOpt.optimize(maxevals=10, model_id=model_id)
 	print("RETRAINING COMPLETED (model id: {})".format(model_id))
-
 
 
 def start():
