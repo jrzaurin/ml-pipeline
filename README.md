@@ -22,11 +22,11 @@ The offline process is fairly standard and all accomplished by running the `init
 **ONLINE PREDICTIONS AND RETRAINING**
 
  0. The App/Service (`app_sample.py`) will send messages (JSON) into the pipeline. These will be processed and App/Service will then get the results of the predictions.
- 1. 1a) The messages from App/Service will be received by the Predictor (`predictor.py`)
+ 1. 1a) The messages from App/Service will be published to Kafka and, eventualy, received by the Predictor (`predictor.py`)
 
- 	1b) The Predictor will process the data and run the algorithm publishing the result, which will be eventually received by App/Service
- 2. After N message the Predictor will publish a "retrain topic" message
- 3. The Trainer (`trainer.py`) will receive the "retrain" message and start retraining the algorithm. In the meantime, the Predictor will not stop serving predictions.
+ 	1b) The Predictor will process the data and run the algorithm publishing the message with the prediction result back to Kafka, which will be eventually received by App/Service
+ 2. After N messages the Predictor will publish a "retrain topic" message
+ 3. The Trainer (`trainer.py`) will receive the "retrain topic" message and start retraining the algorithm. In the meantime, the Predictor will not stop serving predictions.
  4. Once the algorithm is retrained, the Trainer will publish a message with the corresponding information (namely: *"retraining completed"*)
  5. The Predictor will receive the message that retraining is complete, it will load the new model and proceed as usual.
 
