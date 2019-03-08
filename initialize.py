@@ -61,9 +61,10 @@ def create_model():
 	print("creating model...")
 	init_dataprocessor = 'dataprocessor_0_.p'
 	dtrain = pickle.load(open(DATAPROCESSORS_PATH/init_dataprocessor, 'rb'))
-	LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
-	LGBOpt.optimize(maxevals=10)
-
+	# LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
+	# LGBOpt.optimize(maxevals=10)
+	LGBOpt = LGBOptimizer(dtrain, str(MODELS_PATH))
+	LGBOpt.optimize('f1_score', StratifiedKFold, n_splits=3, maxevals=10)
 
 if __name__ == '__main__':
 	create_folders()
