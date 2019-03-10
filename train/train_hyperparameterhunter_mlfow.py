@@ -113,8 +113,8 @@ class LGBOptimizer(object):
         space = dict(
                 is_unbalance = True,
                 learning_rate = Real(0.01, 0.3),
-                num_boost_round=Categorical(np.arange(50, 500, 20)),
-                num_leaves=Categorical(np.arange(31, 256, 4)),
+                num_boost_round=Integer(50, 500),
+                num_leaves=Integer(31, 255),
                 min_child_weight = Real(0.1, 10),
                 colsample_bytree= Real(0.5, 1.),
                 subsample=Real(0.5, 1.),

@@ -117,9 +117,11 @@ class LGBOptimizer(object):
 		else:
 			client = MlflowClient()
 			n_experiments = len(client.list_experiments())
-			client.create_experiment(name=str(n_experiments))
+			experiment_name = 'experiment_' + str(n_experiments)
+			client.create_experiment(name=experiment_name)
 		experiments = client.list_experiments()
 		with mlflow.start_run(experiment_id=experiments[-1].experiment_id) as run:
+		# with mlflow.start_run() as run:
 			model = lgb.LGBMClassifier(**best)
 			model.fit(self.lgtrain.data,
 				self.lgtrain.label,
@@ -164,7 +166,7 @@ class LGBOptimizer(object):
 				stratified=True,
 				early_stopping_rounds=20)
 			self.early_stop_dict[objective.i] = len(cv_result['binary_logloss-mean'])
-			error = round(cv_result['binary_logloss-mean'][-1], 4)
+			error = cv_result['binary_logloss-mean'][-1]
 			objective.i+=1
 			return error
 
@@ -175,7 +177,7 @@ class LGBOptimizer(object):
 		space = {
 			'learning_rate': hp.uniform('learning_rate', 0.01, 0.2),
 			'num_boost_round': hp.quniform('num_boost_round', 50, 500, 20),
-			'num_leaves': hp.quniform('num_leaves', 31, 255, 4),
+			'num_leaves': hp.quniform('num_leaves', 31, 256, 4),
 		    'min_child_weight': hp.uniform('min_child_weight', 0.1, 10),
 		    'colsample_bytree': hp.uniform('colsample_bytree', 0.5, 1.),
 		    'subsample': hp.uniform('subsample', 0.5, 1.),
