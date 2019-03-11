@@ -88,7 +88,7 @@ class LGBOptimizer(object):
 			categorical_feature = self.categorical_columns,
 			free_raw_data=False)
 
-	def optimize(self, maxevals=50, model_id=0):
+	def optimize(self, maxevals=200, model_id=0):
 
 		param_space = self.hyperparameter_space()
 		objective = self.get_objective(self.lgtrain)

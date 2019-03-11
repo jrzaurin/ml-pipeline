@@ -2,12 +2,12 @@ import numpy as np
 import pandas as pd
 import lightgbm as lgb
 import pickle
-import pdb
 import warnings
+import argparse
 import os
+import pdb
 
 from pathlib import Path
-from train.train_hyperopt import LGBOptimizer
 from utils.preprocess_data import build_train
 
 
@@ -50,24 +50,32 @@ def download_data():
 	df_test.to_csv(test_path)
 
 
-
 def create_data_processor():
 	print("creating preprocessor...")
 	dataprocessor = build_train(TRAIN_PATH/'train.csv', DATAPROCESSORS_PATH)
 
 
-
-def create_model():
+def create_model(hyper):
 	print("creating model...")
 	init_dataprocessor = 'dataprocessor_0_.p'
 	dtrain = pickle.load(open(DATAPROCESSORS_PATH/init_dataprocessor, 'rb'))
+	if hyper == "hyperopt":
+		# from train.train_hyperopt import LGBOptimizer
+		from train.train_hyperopt_mlflow import LGBOptimizer
+	elif hyper == "hyperparameterhunter":
+		# from train.train_hyperparameterhunter import LGBOptimizer
+		from train.train_hyperparameterhunter_mlfow import LGBOptimizer
 	LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
-	LGBOpt.optimize(maxevals=10)
-	# LGBOpt = LGBOptimizer(dtrain, str(MODELS_PATH))
-	# LGBOpt.optimize('f1_score', StratifiedKFold, n_splits=3, maxevals=10)
+	LGBOpt.optimize(maxevals=2)
+
 
 if __name__ == '__main__':
-	# create_folders()
-	# download_data()
+
+	parser = argparse.ArgumentParser()
+
+	parser.add_argument("--hyper", type=str, default="hyperopt")
+	args = parser.parse_args()
+	create_folders()
+	download_data()
 	create_data_processor()
-	# create_model()
+	create_model(args.hyper)

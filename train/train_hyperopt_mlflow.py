@@ -91,7 +91,7 @@ class LGBOptimizer(object):
 			categorical_feature = self.categorical_columns,
 			free_raw_data=False)
 
-	def optimize(self, maxevals=50, model_id=0):
+	def optimize(self, maxevals=200, model_id=0, reuse_experiment=False):
 
 		param_space = self.hyperparameter_space()
 		objective = self.get_objective(self.lgtrain)
@@ -106,22 +106,17 @@ class LGBOptimizer(object):
 		best['num_leaves'] = int(best['num_leaves'])
 		best['verbose'] = -1
 
-		# The next few lines are the only ones related to mlflow. One
-		# "annoying" behaviour of mlflow is that when you instantiate a client
-		# it creates the 'mlruns' dir by default as well as the first
-		# experiment and there does not seem to be a way I can change this
-		# behaviour without changing the source code. The solution is the
-		# following hack:
+		# The next few lines are the only ones related to mlflow.
 		if not Path('mlruns').exists():
-			client = MlflowClient()
-		else:
-			client = MlflowClient()
-			n_experiments = len(client.list_experiments())
-			experiment_name = 'experiment_' + str(n_experiments)
-			client.create_experiment(name=experiment_name)
-		experiments = client.list_experiments()
-		with mlflow.start_run(experiment_id=experiments[-1].experiment_id) as run:
-		# with mlflow.start_run() as run:
+            # here set the tracking_uri. If None then http://localhost:5000
+		    client = MlflowClient()
+		    n_experiments=0
+		elif not reuse_experiment:
+		    client = MlflowClient()
+		    n_experiments = len(client.list_experiments())
+		    experiment_name = 'experiment_' + str(n_experiments)
+		    client.create_experiment(name=experiment_name)
+		with mlflow.start_run(experiment_id=n_experiments):
 			model = lgb.LGBMClassifier(**best)
 			model.fit(self.lgtrain.data,
 				self.lgtrain.label,

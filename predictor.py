@@ -13,7 +13,7 @@ PATH = Path('data/')
 MODELS_PATH = PATH/'models'
 DATAPROCESSORS_PATH = PATH/'dataprocessors'
 MESSAGES_PATH = PATH/'messages'
-RETRAIN_EVERY = 20
+RETRAIN_EVERY = 25
 EXTRA_MODELS_TO_KEEP = 1
 
 column_order = pickle.load(open(DATAPROCESSORS_PATH/'column_order.p', 'rb'))

@@ -36,26 +36,29 @@ class LGBOptimizer(object):
             Path to the output directory
         """
 
-        self.PATH = out_dir
+        self.PATH = str(out_dir)
         self.data = trainDataset.data
         self.data['target'] = trainDataset.target
         self.colnames = trainDataset.colnames
         self.categorical_columns = trainDataset.categorical_columns + trainDataset.crossed_columns
 
-    def optimize(self, metrics, cv_type, n_splits, maxevals=200, do_predict_proba=None):
+    def optimize(self, metrics='f1_score', n_splits=3, cv_type=StratifiedKFold,
+        maxevals=200, do_predict_proba=None, model_id=0):
 
         params = self.hyperparameter_space()
         extra_params = self.extra_setup()
 
         env = Environment(
             train_dataset=self.data,
-            results_path=self.PATH,
+            results_path='HyperparameterHunterAssets',
+            # results_path=self.PATH,
             metrics=[metrics],
             do_predict_proba = do_predict_proba,
             cv_type=cv_type,
             cv_params=dict(n_splits=n_splits),
         )
 
+        # optimizer = opt.GradientBoostedRegressionTreeOptimization(iterations=maxevals)
         optimizer = opt.BayesianOptimization(iterations=maxevals)
         optimizer.set_experiment_guidelines(
             model_initializer=lgb.LGBMClassifier,
@@ -66,8 +69,7 @@ class LGBOptimizer(object):
         # there are a few fixes on its way and the next few lines will soon be
         # one. At the moment, to access to the best parameters one has to read
         # from disc and access them
-        best_experiment = self.PATH+\
-            '/HyperparameterHunterAssets/Experiments/Descriptions/'+\
+        best_experiment = 'HyperparameterHunterAssets/Experiments/Descriptions/'+\
             optimizer.best_experiment+'.json'
         with open(best_experiment) as best:
             best = json.loads(best.read())['hyperparameters']['model_init_params']
@@ -77,10 +79,11 @@ class LGBOptimizer(object):
             feature_name=self.colnames,
             categorical_feature=self.categorical_columns
             )
-        pickle.dump(model, open(self.PATH+'/HHmodel.p', 'wb'))
-        pickle.dump(optimizer, open(self.PATH+'/HHoptimizer.p', 'wb'))
+        model_fname = 'model_{}_.p'.format(model_id)
+        best_experiment_fname = 'best_experiment_{}_.p'.format(model_id)
+        pickle.dump(model, open('/'.join([self.PATH,model_fname]), 'wb'))
+        pickle.dump(optimizer, open('/'.join([self.PATH,best_experiment_fname]), 'wb'))
 
-        return
 
     def hyperparameter_space(self, param_space=None):
 
@@ -114,10 +117,3 @@ class LGBOptimizer(object):
             return extra_setup
         else:
             return extra_params
-
-# if __name__ == '__main__':
-
-#     MD_PATH = Path('data/models/')
-#     dtrain = pickle.load(open(MD_PATH/'preprocessor_0_.p', 'rb'))
-#     HHOpt = HHOptimizer(dtrain, str(MD_PATH))
-#     optimizer = HHOpt.optimize('f1_score', StratifiedKFold, n_splits=3, maxevals=3)

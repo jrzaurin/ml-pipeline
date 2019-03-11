@@ -40,13 +40,14 @@ class LGBOptimizer(object):
             Path to the output directory
         """
 
-        self.PATH = out_dir
+        self.PATH = str(out_dir)
         self.data = trainDataset.data
         self.data['target'] = trainDataset.target
         self.colnames = trainDataset.colnames
         self.categorical_columns = trainDataset.categorical_columns + trainDataset.crossed_columns
 
-    def optimize(self, metrics, cv_type, n_splits, maxevals=200, do_predict_proba=None):
+    def optimize(self, metrics='f1_score', n_splits=3, cv_type=StratifiedKFold,
+        maxevals=200, do_predict_proba=None, model_id=0, reuse_experiment=False):
 
         params = self.hyperparameter_space()
         extra_params = self.extra_setup()
@@ -78,20 +79,17 @@ class LGBOptimizer(object):
         with open(best_experiment) as best:
             best = json.loads(best.read())['hyperparameters']['model_init_params']
 
-        # The next few lines are the only ones related to mlflow. One
-        # "annoying" behaviour of mlflow is that when you instantiate a client
-        # it creates the 'mlruns' dir by default as well as the first
-        # experiment and there does not seem to be a way I can change this
-        # behaviour without changing the source code. The solution is the
-        # following hack:
+        # The next few lines are the only ones related to mlflow
         if not Path('mlruns').exists():
+            # here set the tracking_uri. If None then http://localhost:5000
             client = MlflowClient()
-        else:
+            n_experiments=0
+        elif not reuse_experiment:
             client = MlflowClient()
             n_experiments = len(client.list_experiments())
-            client.create_experiment(name=str(n_experiments))
-        experiments = client.list_experiments()
-        with mlflow.start_run(experiment_id=experiments[-1].experiment_id) as run:
+            experiment_name = 'experiment_' + str(n_experiments)
+            client.create_experiment(name=experiment_name)
+        with mlflow.start_run(experiment_id=n_experiments):
             model = lgb.LGBMClassifier(**best)
             X, y = self.data.drop('target',axis=1), self.data.target
             model.fit(X,y,
@@ -103,10 +101,11 @@ class LGBOptimizer(object):
             mlflow.log_metric('f1_score', -optimizer.optimizer_result.fun)
             mlflow.sklearn.log_model(model, "model")
 
-        pickle.dump(model, open(self.PATH+'/HHmodel.p', 'wb'))
-        pickle.dump(optimizer, open(self.PATH+'/HHoptimizer.p', 'wb'))
+        model_fname = 'model_{}_.p'.format(model_id)
+        best_experiment_fname = 'best_experiment_{}_.p'.format(model_id)
+        pickle.dump(model, open('/'.join([self.PATH,model_fname]), 'wb'))
+        pickle.dump(optimizer, open('/'.join([self.PATH,best_experiment_fname]), 'wb'))
 
-        return
 
     def hyperparameter_space(self, param_space=None):
 
@@ -139,10 +138,3 @@ class LGBOptimizer(object):
             return extra_setup
         else:
             return extra_params
-
-# if __name__ == '__main__':
-
-#     MD_PATH = Path('data/models/')
-#     dtrain = pickle.load(open(MD_PATH/'preprocessor_0_.p', 'rb'))
-#     HHOpt = HHOptimizer(dtrain, str(MD_PATH))
-#     optimizer = HHOpt.optimize('f1_score', StratifiedKFold, n_splits=3, maxevals=3)
