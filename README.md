@@ -1,5 +1,5 @@
 # Putting ML in Production
-This repo contains code that we hope is useful to illustrate how one could productionise a real-time algorithm. The companion Medium posts can be found [here](https://medium.com/@jrzaurin/putting-ml-in-production-i-using-apache-kafka-in-python-ce06b3a395c8) and [here](). The code here is meant to be as generic as possible (within certain limits), and is designed to be useful in an scenario similar to the following one.
+This repo contains code that we hope is useful to illustrate how one could productionise a real-time algorithm. The companion Medium posts can be found [here](https://medium.com/@jrzaurin/putting-ml-in-production-i-using-apache-kafka-in-python-ce06b3a395c8) and [here](https://towardsdatascience.com/putting-ml-in-production-ii-logging-and-monitoring-algorithms-91f174044e4e). The code here is meant to be as generic as possible (within certain limits), and is designed to be useful in an scenario similar to the following one.
 
 ## Scenario
 
@@ -36,7 +36,11 @@ The offline process is fairly standard and all accomplished by running the `init
 ```
 python initialize.py
 ```
-By default the optimization process uses Hyperopt. If you want to use HyperparameterHunter simply add `--hyper hyperparameterhunter`. HyperparameterHunter is built on top of [Skopt](https://scikit-optimize.github.io/). It is not our goal here to compare hyperparameter optimization packages. Nonetheless, a brief comparison is included in the Medium post and a notebook comparing Skopt and Hyperopt performances is included here, in the notebooks directory.
+or
+```
+python initialize.py --hyper hyperparameterhunter
+```
+HyperparameterHunter is built on top of [Skopt](https://scikit-optimize.github.io/). It is not our goal here to compare hyperparameter optimization packages. Nonetheless, a brief comparison is included in the Medium post and a notebook comparing Skopt and Hyperopt performances is included here, in the notebooks directory.
 
 2. Start Zookeeper and Kafka. Assuming these are installed using Homebrew, starting these services is as easy as:
 ```
@@ -54,8 +58,10 @@ python predictor.py
 ```
 python trainer.py
 ```
-Remember to add `--hyper hyperparameterhunter` if you are using HyperparameterHunter
-
+or
+```
+python trainer.py --hyper hyperparameterhunter
+```
 5. In Terminal#3 run the Sample App
 ```
 python samplea_app.py
@@ -72,6 +78,6 @@ After `RETRAIN_EVERY` messages (parameter to be set by the user), the user will 
 
 
 ## Logging and monitoring
-To log all the information generated form the pipeline as it retraines the algorithm one could directly use HyperparameterHunter, which is fantastic precisely at that task. In addition, we have also used MLflow, which comes with a very convenient UI. [Our second posts]() focuses on the interplay of these two tools. All the related code can be found at the `train` module within `train_hyperopt_mlflow.py` or `train_hyperparameterhunter_mlfow.py`.
+To log all the information generated form the pipeline as it retraines the algorithm one could directly use HyperparameterHunter, which is fantastic precisely at that task. In addition, we have also used MLflow, which comes with a very convenient UI. [Our second posts](https://towardsdatascience.com/putting-ml-in-production-ii-logging-and-monitoring-algorithms-91f174044e4e) focuses on the interplay of these two tools. All the related code can be found at the `train` module within `train_hyperopt_mlflow.py` or `train_hyperparameterhunter_mlfow.py`.
 
 Comments or suggestions, please email: jrzaurin@gmail.com
