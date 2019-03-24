@@ -4,6 +4,9 @@ import pandas as pd
 import pickle
 import argparse
 
+import sagemaker as sage
+from time import gmtime, strftime
+
 from pathlib import Path
 from kafka import KafkaConsumer
 
@@ -15,22 +18,41 @@ KAFKA_HOST = 'localhost:9092'
 RETRAIN_TOPIC = 'retrain_topic'
 PATH = Path('data/')
 TRAIN_DATA = PATH/'train/train.csv'
-DATAPROCESSORS_PATH = PATH/'dataprocessors'
-MODELS_PATH = PATH/'models'
+# DATAPROCESSORS_PATH = PATH/'dataprocessors'
+# MODELS_PATH = PATH/'models'
 MESSAGES_PATH = PATH/'messages'
 
 
 def train(model_id, messages, hyper):
 	print("RETRAINING STARTED (model id: {})".format(model_id))
-	dtrain = build_train(TRAIN_DATA, DATAPROCESSORS_PATH, model_id, messages)
-	if hyper == "hyperopt":
-		# from train.train_hyperopt import LGBOptimizer
-		from train.train_hyperopt_mlflow import LGBOptimizer
-	elif hyper == "hyperparameterhunter":
-		# from train.train_hyperparameterhunter import LGBOptimizer
-		from train.train_hyperparameterhunter_mlfow import LGBOptimizer
-	LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
-	LGBOpt.optimize(maxevals=2, model_id=model_id)
+	# dtrain = build_train(TRAIN_DATA, DATAPROCESSORS_PATH, model_id, messages)
+	# if hyper == "hyperopt":
+	# 	# from train.train_hyperopt import LGBOptimizer
+	# 	from train.train_hyperopt_mlflow import LGBOptimizer
+	# elif hyper == "hyperparameterhunter":
+	# 	# from train.train_hyperparameterhunter import LGBOptimizer
+	# 	from train.train_hyperparameterhunter_mlfow import LGBOptimizer
+	# LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
+	# LGBOpt.optimize(maxevals=2, model_id=model_id)
+
+	sess = sage.Session()
+
+	# 1 - Upload data to S3
+	train_data_location = sess.upload_data(messages, key_prefix=prefix)
+
+	# 2 - Call SageMaker algorithm
+	account = sess.boto_session.client('sts').get_caller_identity()['Account']
+	region = sess.boto_session.region_name
+	image = '{}.dkr.ecr.{}.amazonaws.com/ml-pipeline-lightgbm-hyperopt:latest'.format(account, region)
+
+	lightgbm_sagemaker = sage.estimator.Estimator(image,
+	                       role, 1, 'ml.c4.2xlarge',
+	                       output_path="s3://{}/output".format(sess.default_bucket()),
+	                       sagemaker_session=sess,
+	                       hyperparameters={'model_id': model_id})
+
+	lightgbm_sagemaker.fit(train_data_location)
+
 	print("RETRAINING COMPLETED (model id: {})".format(model_id))
 
 

@@ -3,6 +3,9 @@ import json
 import pandas as pd
 import pickle
 
+import boto3
+import botocore
+
 from pathlib import Path
 from kafka import KafkaConsumer
 from utils.messages_utils import append_message, read_messages_count, send_retrain_message, publish_prediction
@@ -15,6 +18,8 @@ DATAPROCESSORS_PATH = PATH/'dataprocessors'
 MESSAGES_PATH = PATH/'messages'
 RETRAIN_EVERY = 25
 EXTRA_MODELS_TO_KEEP = 1
+
+BUCKET_NAME='ml_pipeline'
 
 column_order = pickle.load(open(DATAPROCESSORS_PATH/'column_order.p', 'rb'))
 dataprocessor = None
@@ -34,6 +39,35 @@ def is_retraining_message(msg):
 def is_application_message(msg):
 	message = json.loads(msg.value)
 	return msg.topic == 'app_messages' and 'prediction' not in message
+
+
+def load_column_order_s3():
+	Key = "Name of the file in S3 that you want to download"
+	outPutName = "Output file name(The name you want to save after we download from s3)"
+
+	s3 = boto3.resource('s3')
+	try:
+	    s3.Bucket(BUCKET_NAME).download_file(Key, outPutName)
+	except botocore.exceptions.ClientError as e:
+	    if e.response['Error']['Code'] == "404":
+	        print("The object does not exist.")
+	    else:
+	        raise
+
+
+def load_dataprocessor_s3(dataprocessor_id):
+	dataprocessor_fname = 'dataprocessor_{}_.p'.format(dataprocessor_id)
+	Key = 'processors/{}'.format(dataprocessor_fname)
+	outPutName = DATAPROCESSORS_PATH/dataprocessor_fname
+
+	s3 = boto3.resource('s3')
+	try:
+	    s3.Bucket(BUCKET_NAME).download_file(Key, outPutName)
+	except botocore.exceptions.ClientError as e:
+	    if e.response['Error']['Code'] == "404":
+	        print("The dataprocessor object {} does not exist.".format(Key))
+	    else:
+	        raise
 
 
 def predict(message, column_order):
