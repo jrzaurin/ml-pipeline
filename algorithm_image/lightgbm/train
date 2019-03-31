@@ -17,7 +17,7 @@ import logging
 import numpy as np
 import lightgbm as lgb
 
-from hyperopt import hp, tpe
+from hyperopt import hp, tpe, Trials
 from hyperopt.fmin import fmin
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, confusion_matrix
@@ -28,7 +28,7 @@ import pandas as pd
 
 from sklearn import tree
 
-from train.train_hyperopt_mlflow import LGBOptimizer
+from training.train_hyperopt_mlflow import LGBOptimizer
 
 # These are the paths to where SageMaker mounts interesting things in your container.
 
@@ -137,11 +137,7 @@ class LGBOptimizer(object):
         best['verbose'] = -1
 
         # The next few lines are the only ones related to mlflow.
-        if not Path('mlruns').exists():
-            # here set the tracking_uri. If None then http://localhost:5000
-            client = MlflowClient()
-            n_experiments=0
-        elif not reuse_experiment:
+        if not reuse_experiment:
             client = MlflowClient()
             n_experiments = len(client.list_experiments())
             experiment_name = 'experiment_' + str(n_experiments)
@@ -222,12 +218,21 @@ class LGBOptimizer(object):
 # The function to execute the training.
 def train():
     print('Starting the training.')
-    try:
+    try:        
+        with open(param_path, 'rb') as out:
+            params = json.load(out)
+            model_id = params['model_id']
+
         print("RETRAINING STARTED (model id: {})".format(model_id))
 
-        TRAIN_DATA = '/opt/ml/input/data/training/train.csv'
+        input_files = [ os.path.join(training_path, file) for file in os.listdir(training_path) ]
 
-        dtrain = build_train(TRAIN_DATA, DATAPROCESSORS_PATH, model_id, messages)
+        print("INPUT FILES: {}".format(input_files))
+        TRAIN_DATA = input_files[0]
+        messages = None
+
+        dtrain = build_train(TRAIN_DATA, '/opt/ml', model_id, messages)
+        MODELS_PATH = '.'
         LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
         model_path = LGBOpt.optimize(maxevals=2, model_id=model_id)
 
@@ -246,6 +251,8 @@ def train():
         print('Exception during training: ' + str(e) + '\n' + trc, file=sys.stderr)
         # A non-zero exit code causes the training job to be marked as Failed.
         sys.exit(255)
+
+
 
 if __name__ == '__main__':
     train()

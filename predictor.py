@@ -21,14 +21,14 @@ EXTRA_MODELS_TO_KEEP = 1
 
 BUCKET_NAME='ml_pipeline'
 
-column_order = pickle.load(open(DATAPROCESSORS_PATH/'column_order.p', 'rb'))
-dataprocessor = None
+column_order = load_column_order_s3()
+# dataprocessor = None
 consumer = None
 model = None
 
 
-def reload_model(path):
-	return pickle.load(open(path, 'rb'))
+# def reload_model(path):
+# 	return pickle.load(open(path, 'rb'))
 
 
 def is_retraining_message(msg):
@@ -42,11 +42,12 @@ def is_application_message(msg):
 
 
 def load_column_order_s3():
-	Key = "Name of the file in S3 that you want to download"
-	outPutName = "Output file name(The name you want to save after we download from s3)"
-
-	s3 = boto3.resource('s3')
 	try:
+		s3 = boto3.resource('s3')
+
+		Key = "column_order.p"
+		outPutName = "column_order.p"
+
 	    s3.Bucket(BUCKET_NAME).download_file(Key, outPutName)
 	except botocore.exceptions.ClientError as e:
 	    if e.response['Error']['Code'] == "404":
@@ -55,19 +56,19 @@ def load_column_order_s3():
 	        raise
 
 
-def load_dataprocessor_s3(dataprocessor_id):
-	dataprocessor_fname = 'dataprocessor_{}_.p'.format(dataprocessor_id)
-	Key = 'processors/{}'.format(dataprocessor_fname)
-	outPutName = DATAPROCESSORS_PATH/dataprocessor_fname
+# def load_dataprocessor_s3(dataprocessor_id):
+# 	dataprocessor_fname = 'dataprocessor_{}_.p'.format(dataprocessor_id)
+# 	Key = 'processors/{}'.format(dataprocessor_fname)
+# 	outPutName = DATAPROCESSORS_PATH/dataprocessor_fname
 
-	s3 = boto3.resource('s3')
-	try:
-	    s3.Bucket(BUCKET_NAME).download_file(Key, outPutName)
-	except botocore.exceptions.ClientError as e:
-	    if e.response['Error']['Code'] == "404":
-	        print("The dataprocessor object {} does not exist.".format(Key))
-	    else:
-	        raise
+# 	s3 = boto3.resource('s3')
+# 	try:
+# 	    s3.Bucket(BUCKET_NAME).download_file(Key, outPutName)
+# 	except botocore.exceptions.ClientError as e:
+# 	    if e.response['Error']['Code'] == "404":
+# 	        print("The dataprocessor object {} does not exist.".format(Key))
+# 	    else:
+# 	        raise
 
 
 def predict(message, column_order):
@@ -80,22 +81,28 @@ def predict(message, column_order):
 	# number of messages have been collected, one would have to wait until we
 	# can collect RETRAIN_EVERY targets AND THEN retrain
 	row.drop('income_bracket', axis=1, inplace=True)
-	trow = dataprocessor.transform(row)
-	return model.predict(trow)[0]
+	
+	# trow = dataprocessor.transform(row)
+	# return model.predict(trow)[0]
+
+	response = sagemaker_client.invoke_endpoint(EndpointName='lightgbm-ml_pipeline',
+	                                  			Body=json.dumps(row.to_json()),
+	                                  			ContentType='application/json')
+	return response['Body'].read()
 
 
-def start(model_id, messages_count, batch_id):
+def start(model_id, messages_count, batch_id, sagemaker_client):
 	for msg in consumer:
 		message = json.loads(msg.value)
 
 		if is_retraining_message(msg):
-			model_fname = 'model_{}_.p'.format(model_id)
-			model = reload_model(MODELS_PATH/model_fname)
+		# 	model_fname = 'model_{}_.p'.format(model_id)
+		# 	model = reload_model(MODELS_PATH/model_fname)
 			print("NEW MODEL RELOADED {}".format(model_id))
 
 		elif is_application_message(msg):
 			request_id = message['request_id']
-			pred = predict(message['data'], column_order)
+			pred = predict(message['data'], column_order, sagemaker_client)
 			publish_prediction(pred, request_id)
 
 			append_message(message['data'], MESSAGES_PATH, batch_id)
@@ -107,9 +114,9 @@ def start(model_id, messages_count, batch_id):
 
 
 if __name__ == '__main__':
-	dataprocessor_id = 0
-	dataprocessor_fname = 'dataprocessor_{}_.p'.format(dataprocessor_id)
-	dataprocessor = pickle.load(open(DATAPROCESSORS_PATH/dataprocessor_fname, 'rb'))
+	# dataprocessor_id = 0
+	# dataprocessor_fname = 'dataprocessor_{}_.p'.format(dataprocessor_id)
+	# dataprocessor = pickle.load(open(DATAPROCESSORS_PATH/dataprocessor_fname, 'rb'))
 
 	messages_count = read_messages_count(MESSAGES_PATH, RETRAIN_EVERY)
 	batch_id = messages_count % RETRAIN_EVERY
@@ -121,4 +128,6 @@ if __name__ == '__main__':
 	consumer = KafkaConsumer(bootstrap_servers=KAFKA_HOST)
 	consumer.subscribe(TOPICS)
 
-	start(model_id, messages_count, batch_id)
+	sagemaker_client = boto3.client('runtime.sagemaker')
+
+	start(model_id, messages_count, batch_id, sagemaker_client)

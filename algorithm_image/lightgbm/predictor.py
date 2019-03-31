@@ -60,25 +60,28 @@ def transformation():
     data = None
 
     # Convert from CSV to pandas
-    if flask.request.content_type == 'text/csv':
-        print("---CSV")
+    if flask.request.content_type == 'application/json':
+        print("---JSON")
         data = flask.request.data.decode('utf-8')
         print(data)
         print("....")
         s = io.StringIO(data)
-        data = pd.read_csv(s, header=None)
+        data = pd.read_json(s)
         print(data)
         print("....")
     else:
-        return flask.Response(response='This predictor only supports CSV data', status=415, mimetype='text/plain')
-
+        return flask.Response(response='This predictor only supports JSON data', status=415, mimetype='text/plain')
+        
     print('Invoked with {} records'.format(data.shape[0]))
+    dataprocessor_fname = 'dataprocessor_0_.p'
+    dataprocessor = pickle.load(open('/opt/ml/{}'.format(dataprocessor_fname), 'rb'))
 
     # Drop first column, since sample notebook uses training data to show case predictions
     data.drop(data.columns[[0]],axis=1,inplace=True)
+    trow = dataprocessor.transform(data)
 
     # Do the prediction
-    predictions = ScoringService.predict(data)
+    predictions = ScoringService.predict(trow)
 
     # Convert from numpy back to CSV
     out = io.StringIO()

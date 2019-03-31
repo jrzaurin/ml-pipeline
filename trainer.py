@@ -34,12 +34,12 @@ def train(model_id, messages, hyper):
 	# 	from train.train_hyperparameterhunter_mlfow import LGBOptimizer
 	# LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
 	# LGBOpt.optimize(maxevals=2, model_id=model_id)
-
+	
 	sess = sage.Session()
-
+	
 	# 1 - Upload data to S3
 	train_data_location = sess.upload_data(messages, key_prefix=prefix)
-
+	
 	# 2 - Call SageMaker algorithm
 	account = sess.boto_session.client('sts').get_caller_identity()['Account']
 	region = sess.boto_session.region_name
@@ -50,8 +50,26 @@ def train(model_id, messages, hyper):
 	                       output_path="s3://{}/output".format(sess.default_bucket()),
 	                       sagemaker_session=sess,
 	                       hyperparameters={'model_id': model_id})
-
+	
 	lightgbm_sagemaker.fit(train_data_location)
+
+	# Create endpoint config
+	session = lightgbm_sagemaker.sagemaker_session
+
+	container_def = lightgbm_sagemaker.prepare_container_def(instance_type='ml.m4.xlarge')
+	model_name = str(random.random())[2:]
+	session.create_model(model_name, role, container_def)
+
+	config_name = str(random.random())[2:]
+	session.create_endpoint_config(name=config_name,
+	                              model_name=model_name,
+	                              initial_instance_count=1,
+	                              instance_type='ml.m4.xlarge')
+	
+	# Update desired endpoint with new Endpoint Config
+	client = boto3.client('sagemaker')
+	client.update_endpoint(EndpointName='lightgbm-ml_pipeline',
+	                       EndpointConfigName=config_name)
 
 	print("RETRAINING COMPLETED (model id: {})".format(model_id))
 
