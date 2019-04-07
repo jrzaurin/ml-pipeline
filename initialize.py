@@ -66,7 +66,7 @@ def create_model(hyper):
 		# from train.train_hyperparameterhunter import LGBOptimizer
 		from train.train_hyperparameterhunter_mlfow import LGBOptimizer
 	LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
-	LGBOpt.optimize(maxevals=2)
+	LGBOpt.optimize(maxevals=50)
 
 
 if __name__ == '__main__':
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
 	parser.add_argument("--hyper", type=str, default="hyperopt")
 	args = parser.parse_args()
-	create_folders()
-	download_data()
+	# create_folders()
+	# download_data()
 	create_data_processor()
 	create_model(args.hyper)
