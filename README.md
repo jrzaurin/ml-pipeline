@@ -64,7 +64,7 @@ python trainer.py --hyper hyperparameterhunter
 ```
 5. In Terminal#3 run the Sample App
 ```
-python samplea_app.py
+python sample_app.py
 ```
 
 Below we have included a GIF showing the steps 3, 4 and 5.
