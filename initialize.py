@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
 	parser.add_argument("--hyper", type=str, default="hyperopt")
 	args = parser.parse_args()
-	# create_folders()
-	# download_data()
+	create_folders()
+	download_data()
 	create_data_processor()
 	create_model(args.hyper)
