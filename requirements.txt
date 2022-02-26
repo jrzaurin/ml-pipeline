@@ -22,7 +22,7 @@ kafka-python==1.4.6
 lightgbm==2.2.3
 Mako==1.0.13
 MarkupSafe==1.1.1
-mlflow==1.0.0
+mlflow==1.23.1
 networkx==2.3
 numpy==1.16.4
 pandas==0.24.2
