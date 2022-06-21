@@ -24,7 +24,7 @@ Mako==1.0.13
 MarkupSafe==1.1.1
 mlflow==1.0.0
 networkx==2.3
-numpy==1.16.4
+numpy==1.22.0
 pandas==0.24.2
 protobuf==3.9.0
 pymongo==3.8.0
